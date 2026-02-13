@@ -1,0 +1,40 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    background: radial-gradient(circle at center, #1a0010 0%, #000000 70%);
+    overflow: hidden;
+    font-family: 'Georgia', serif;
+}
+
+/* Canvas */
+canvas {
+    display: block;
+}
+
+/* Buton */
+#nextPageBtn{
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 40px;
+    font-size: 16px;
+    background: linear-gradient(45deg,#ff4fa3,#ff0080);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 0 25px rgba(255,0,128,0.6);
+    transition: 0.3s ease;
+    z-index: 10;
+}
+
+#nextPageBtn:hover{
+    transform: translateX(-50%) scale(1.1);
+    box-shadow: 0 0 40px rgba(255,0,128,0.9);
+}

@@ -1,0 +1,52 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:black;
+    overflow:hidden;
+    font-family: Arial, sans-serif;
+}
+
+canvas{
+    display:block;
+}
+
+/* 🔥 BUTON */
+
+#nextPageBtn{
+    position:absolute;
+    bottom:80px;
+    left:50%;
+    transform:translateX(-50%);
+
+    padding:14px 50px;
+    font-size:18px;
+    letter-spacing:3px;
+
+    background:linear-gradient(45deg,#ff4d6d,#b3003c);
+    color:white;
+    border:none;
+    border-radius:40px;
+
+    cursor:pointer;
+    transition:0.4s ease;
+
+    box-shadow:0 0 20px rgba(255,0,80,0.6);
+
+    opacity:0;
+    animation:fadeInBtn 2s ease 2s forwards;
+}
+
+#nextPageBtn:hover{
+    transform:translateX(-50%) scale(1.08);
+    box-shadow:0 0 40px rgba(104, 16, 44, 0.932);
+}
+
+@keyframes fadeInBtn{
+    to{
+        opacity:1;
+    }
+}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sadece Senin İçin</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        #bg-video {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="overlay">
+        <button id="startBtn">Hoşgeldin</button>
+    </div>
+
+    <!-- VIDEO yerine FOTOĞRAF -->
+    <img src="deniz.jpg" id="bg-video" alt="Arkaplan">
+
+    <canvas id="canvas"></canvas>
+
+    <div id="message-container"></div>
+
+    <audio id="bg-music" src="huzur.mp3" loop></audio>
+
+    <!-- ALT ORTA BUTON -->
+    <div id="bottom-button">
+        <a href="yeni-sayfa.html">Başka Bir Dünyaya Geç</a>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
