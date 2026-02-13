@@ -90,15 +90,28 @@ button {
     transition: opacity 1s ease;
 }
 
+/* 🔥 DÜZELTİLMİŞ BUTON */
 #bottom-button a {
-    padding: 14px 35px;
-    font-size: 1rem;
+
+    display: inline-block;
+
+    padding: 14px 28px;
+    font-size: clamp(14px, 4vw, 18px);
+
+    text-align: center;
+    white-space: nowrap;
+
+    max-width: 90vw;
+    width: fit-content;
+
     text-decoration: none;
     color: white;
     border: 2px solid white;
     border-radius: 50px;
+
     backdrop-filter: blur(10px);
     background: rgba(255,255,255,0.05);
+
     transition: all 0.3s ease;
 }
 
@@ -106,4 +119,20 @@ button {
     background: white;
     color: black;
     transform: scale(1.05);
+}
+
+/* 🔥 MOBİL OPTİMİZASYON */
+@media (max-width: 600px){
+
+    #bottom-button{
+        bottom: 60px;
+    }
+
+    #bottom-button a{
+        padding: 12px 22px;
+        font-size: 15px;
+        max-width: 85vw;
+        white-space: normal; /* taşarsa alt satıra geçsin */
+    }
+
 }

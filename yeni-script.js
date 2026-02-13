@@ -3,16 +3,24 @@ const ctx = canvas.getContext("2d");
 
 let width, height;
 let particles = [];
-let risingParticles = []; // 🔥 Yeni sistem
+let risingParticles = []; 
 
 const PARTICLE_COUNT = 6000;
-const HEART_SCALE = 20;
+let HEART_SCALE; // 🔥 artık sabit değil
 const FORM_SPEED = 0.007;
-const THICKNESS = 18;
+let THICKNESS; // 🔥 artık sabit değil
 
 function resize(){
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
+
+    // 🔥 Ekrana göre otomatik ölçek
+    const base = Math.min(width, height);
+
+    HEART_SCALE = base / 38;   // kalbin genel boyutu
+    THICKNESS = base / 45;     // çizgi kalınlığı
+
+    createParticles(); // 🔥 resize olunca kalp yeniden oluşsun
 }
 window.addEventListener("resize", resize);
 resize();
@@ -56,9 +64,6 @@ let pulseTime = 0;
 const pulseSpeed = 0.002;
 const pulseAmount = 0.05;
 
-//
-// 💥 DAĞILMA EFEKTİ
-//
 function explode(x, y) {
     particles.forEach(p => {
         const dx = p.x - x;
@@ -84,9 +89,6 @@ canvas.addEventListener("touchmove", e => {
     explode(touch.clientX, touch.clientY);
 });
 
-//
-// ✨ YUKARI ÇIKAN PARTİKÜLLER
-//
 function spawnRisingParticle() {
     risingParticles.push({
         x: Math.random() * width,
@@ -99,7 +101,6 @@ function spawnRisingParticle() {
 
 function updateRisingParticles() {
 
-    // Rastgele üret
     if (Math.random() < 0.08) {
         spawnRisingParticle();
     }
@@ -113,7 +114,7 @@ function updateRisingParticles() {
         ctx.globalAlpha = p.alpha;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = "#ffffff"; // beyaz (istersen #cccccc yapabilirsin)
+        ctx.fillStyle = "#ffffff";
         ctx.fill();
         ctx.globalAlpha = 1;
 
@@ -128,7 +129,6 @@ function animate() {
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, width, height);
 
-    // 🔥 Önce arka plan partikülleri çiz
     updateRisingParticles();
 
     pulseTime += 1;
@@ -142,7 +142,6 @@ function animate() {
     particles.forEach(p => {
 
         p.x += (p.targetX - p.x) * FORM_SPEED;
-
         p.y += (p.targetY - p.y) * FORM_SPEED;
 
         p.x += p.vx;
