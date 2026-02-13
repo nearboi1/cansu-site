@@ -184,6 +184,6 @@ nextBtn.addEventListener("click", () => {
     document.body.style.opacity = "0";
 
     setTimeout(()=>{
-        window.location.href = "dorduncu-sayfa.html";
+        window.location.href = "paytak.html";
     },1000);
 });
