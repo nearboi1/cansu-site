@@ -4,9 +4,13 @@
     box-sizing: border-box;
 }
 
+/* 🔥 MOBİL SEÇİM ENGELLEME */
 body, html {
     height: 100%;
     font-family: sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
 }
 
 #game {
@@ -17,7 +21,7 @@ body, html {
     overflow: hidden;
 }
 
-/* 🔥 KARAKTER */
+/* KARAKTER */
 #player {
     position: absolute;
     bottom: 120px;
@@ -29,7 +33,7 @@ body, html {
     background-position: center;
 }
 
-/* 🔥 CANSU YAZISI */
+/* CANSU */
 #playerName{
     position:absolute;
     top:-28px;
@@ -39,7 +43,6 @@ body, html {
     letter-spacing:2px;
     color:rgba(80,80,80,0.6);
     font-weight:600;
-    user-select:none;
     pointer-events:none;
 }
 
@@ -63,9 +66,7 @@ body, html {
     text-shadow: 1px 1px 5px #000;
 }
 
-
-/* 🔥 ULTRA PROFESYONEL BUTONLAR */
-
+/* BUTONLAR */
 #controls{
     position:absolute;
     bottom:25px;
@@ -75,16 +76,14 @@ body, html {
     gap:25px;
 }
 
-/* CAM EFEKTİ */
+/* 🔥 BUTON MOBİL FIX */
 #controls button{
     width:95px;
     height:95px;
     border:none;
     border-radius:50%;
-
     font-size:38px;
     color:white;
-
     cursor:pointer;
 
     background: linear-gradient(145deg,#ff7a7a,#ffb3b3);
@@ -96,14 +95,17 @@ body, html {
     backdrop-filter: blur(10px);
 
     transition: all .15s;
+
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-touch-callout:none;
+    touch-action: manipulation;
 }
 
-/* hover */
 #controls button:hover{
     transform:scale(1.08);
 }
 
-/* basınca */
 #controls button:active{
     transform:scale(0.92);
     box-shadow:

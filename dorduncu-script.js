@@ -12,12 +12,9 @@ let hearts = [];
 let moveLeft = false;
 let moveRight = false;
 
-// 🔥 KARAKTER GENİŞLİĞİ (CSS ile aynı olmalı)
 const PLAYER_WIDTH = 240;
 const HEART_SIZE = 20;
 
-
-// PLAYER ORTALA
 function centerPlayer(){
     playerPos = (game.offsetWidth / 2) - (PLAYER_WIDTH / 2);
     player.style.left = playerPos + 'px';
@@ -26,8 +23,7 @@ function centerPlayer(){
 window.addEventListener("load", centerPlayer);
 window.addEventListener("resize", centerPlayer);
 
-
-// ✅ KLAVYE
+// KLAVYE
 document.addEventListener('keydown', (e) => {
     if(e.key === 'ArrowLeft') moveLeft = true;
     if(e.key === 'ArrowRight') moveRight = true;
@@ -38,14 +34,12 @@ document.addEventListener('keyup', (e) => {
     if(e.key === 'ArrowRight') moveRight = false;
 });
 
-
-// ✅ BUTONLAR (TEK SİSTEM — daha temiz)
+// BUTON
 function pressLeft(){ moveLeft = true; }
 function releaseLeft(){ moveLeft = false; }
 
 function pressRight(){ moveRight = true; }
 function releaseRight(){ moveRight = false; }
-
 
 // mouse
 leftBtn.addEventListener('mousedown', pressLeft);
@@ -56,16 +50,23 @@ rightBtn.addEventListener('mousedown', pressRight);
 rightBtn.addEventListener('mouseup', releaseRight);
 rightBtn.addEventListener('mouseleave', releaseRight);
 
-// touch
-leftBtn.addEventListener('touchstart', pressLeft);
+// 🔥 TOUCH FIX
+leftBtn.addEventListener('touchstart', (e)=>{
+    e.preventDefault();
+    pressLeft();
+});
+
 leftBtn.addEventListener('touchend', releaseLeft);
 
-rightBtn.addEventListener('touchstart', pressRight);
+rightBtn.addEventListener('touchstart', (e)=>{
+    e.preventDefault();
+    pressRight();
+});
+
 rightBtn.addEventListener('touchend', releaseRight);
 
 
-
-// 🔥 KALP OLUŞTUR
+// KALP
 function createHeart() {
 
     const heart = document.createElement('div');
@@ -80,16 +81,12 @@ function createHeart() {
     hearts.push(heart);
 }
 
-
-
-// 🔥 OYUN LOOP
+// LOOP
 function updateGame() {
 
-    // hareket
     if(moveLeft) playerPos -= 8;
     if(moveRight) playerPos += 8;
 
-    // sınırlar
     if(playerPos < 0) playerPos = 0;
 
     if(playerPos > game.offsetWidth - PLAYER_WIDTH)
@@ -97,19 +94,14 @@ function updateGame() {
 
     player.style.left = playerPos + 'px';
 
-
-
-    // kalpler
     hearts.forEach((heart, index) => {
 
         let heartTop = parseFloat(heart.style.top);
-        heartTop += 2.4; // romantik yavaşlık 🙂
+        heartTop += 2.4;
         heart.style.top = heartTop + 'px';
 
         let heartLeft = parseFloat(heart.style.left);
 
-
-        // 🔥 GELİŞMİŞ ÇARPIŞMA (çok daha doğru)
         const playerTop = game.offsetHeight - 270;
 
         if(
@@ -120,24 +112,10 @@ function updateGame() {
             score++;
             scoreDisplay.textContent = 'Puan: ' + score;
 
-            // mini kalp efekti
-            const msg = document.createElement('div');
-            msg.textContent = '💖';
-            msg.style.position = 'absolute';
-            msg.style.left = heartLeft + 'px';
-            msg.style.top = heartTop + 'px';
-            msg.style.fontSize = '26px';
-            msg.style.pointerEvents = 'none';
-
-            game.appendChild(msg);
-
-            setTimeout(()=> msg.remove(), 500);
-
             heart.remove();
             hearts.splice(index,1);
         }
 
-        // ekran dışı
         if(heartTop > game.offsetHeight){
             heart.remove();
             hearts.splice(index,1);
@@ -146,9 +124,5 @@ function updateGame() {
     });
 }
 
-
-// 🔥 FPS gibi akıcı olur
 setInterval(updateGame, 16);
-
-// kalp sıklığı
 setInterval(createHeart, 750);
