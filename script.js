@@ -1,22 +1,22 @@
-console.log(document.getElementById("jumpBtn"));
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const jumpBtn = document.getElementById("jumpBtn");
 
+const isMobile = window.innerWidth < 768;
+
 const CONFIG = {
-  particleCount: 2000,
-  baseEventHorizon: 120,
+  particleCount: isMobile ? 1000 : 2000,
   gravity: 0.15,
   backgroundFade: 0.08,
   maxDistanceFactor: 0.9
 };
 
 let particles = [];
-let eventHorizon = CONFIG.baseEventHorizon;
+let eventHorizon = 100;
 
 let zoomLevel = 1;
 let velocity = 0;
-let acceleration = 0.00008; // düşüş hızını buradan ayarlıyorsun
+let acceleration = 0.00008; // düşüş hızını buradan ayarlayabilirsin
 let isJumping = false;
 
 let showText = false;
@@ -24,15 +24,21 @@ let textAlpha = 0;
 let blackScreen = false;
 
 // ======================
-// Resize
+// Resize (Responsive)
 // ======================
 function resize() {
   const dpr = window.devicePixelRatio || 1;
+
   canvas.width = window.innerWidth * dpr;
   canvas.height = window.innerHeight * dpr;
+
   canvas.style.width = window.innerWidth + "px";
   canvas.style.height = window.innerHeight + "px";
+
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  // Kara deliği ekrana göre ayarla
+  eventHorizon = Math.min(window.innerWidth, window.innerHeight) * 0.08;
 }
 window.addEventListener("resize", resize);
 resize();
@@ -56,8 +62,10 @@ class Particle {
 
   reset(initial = false) {
     this.angle = Math.random() * Math.PI * 2;
+
     this.distance =
-      Math.random() * Math.max(canvas.width, canvas.height) *
+      Math.random() *
+        Math.max(window.innerWidth, window.innerHeight) *
         CONFIG.maxDistanceFactor +
       eventHorizon;
 
@@ -70,7 +78,10 @@ class Particle {
     this.angle += this.speed;
 
     let gravityForce = CONFIG.gravity;
-    if (isJumping) gravityForce *= 5;
+
+    if (isJumping) {
+      gravityForce *= 6; // düşüşte daha güçlü çekim
+    }
 
     this.distance -= gravityForce * (1 + 200 / this.distance);
 
@@ -79,10 +90,11 @@ class Particle {
     }
 
     this.x =
-      canvas.width / 2 +
+      window.innerWidth / 2 +
       Math.cos(this.angle) * this.distance;
+
     this.y =
-      canvas.height / 2 +
+      window.innerHeight / 2 +
       Math.sin(this.angle) * this.distance;
 
     if (this.alpha < 0.7) this.alpha += 0.01;
@@ -100,8 +112,8 @@ class Particle {
 // Black Hole
 // ======================
 function drawBlackHole() {
-  const centerX = canvas.width / 2;
-  const centerY = canvas.height / 2;
+  const centerX = window.innerWidth / 2;
+  const centerY = window.innerHeight / 2;
 
   const glow = ctx.createRadialGradient(
     centerX,
@@ -143,30 +155,32 @@ function animate() {
 
   if (!blackScreen) {
     ctx.fillStyle = `rgba(0,0,10,${CONFIG.backgroundFade})`;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
   }
 
   if (isJumping && !blackScreen) {
     velocity += acceleration;
     zoomLevel += velocity;
-    eventHorizon += velocity * 5;
+    eventHorizon += velocity * 6;
+
+    // Sinematik yavaş başlangıç
+    acceleration += 0.000002;
 
     if (zoomLevel > 8) {
       blackScreen = true;
 
-      // 1 saniye sonra yazı gelsin
       setTimeout(() => {
         showText = true;
-      }, 1000);
+      }, 1200);
     }
   }
 
   if (!blackScreen) {
     ctx.save();
 
-    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
     ctx.scale(zoomLevel, zoomLevel);
-    ctx.translate(-canvas.width / 2, -canvas.height / 2);
+    ctx.translate(-window.innerWidth / 2, -window.innerHeight / 2);
 
     drawBlackHole();
 
@@ -178,22 +192,27 @@ function animate() {
     ctx.restore();
   } else {
     ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
   }
 
   // ======================
-  // FINAL TEXT
+  // FINAL TEXT (Responsive)
   // ======================
   if (showText) {
     if (textAlpha < 1) textAlpha += 0.01;
 
+    const fontSize =
+      Math.min(window.innerWidth, window.innerHeight) * 0.06;
+
     ctx.fillStyle = `rgba(255,255,255,${textAlpha})`;
-    ctx.font = "32px Arial";
+    ctx.font = `${fontSize}px Arial`;
     ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
     ctx.fillText(
       "Sessizliğin en büyük haykırış",
-      canvas.width / 2,
-      canvas.height / 2
+      window.innerWidth / 2,
+      window.innerHeight / 2
     );
   }
 
