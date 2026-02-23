@@ -1,242 +1,203 @@
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const overlay = document.getElementById('overlay');
-const startBtn = document.getElementById('startBtn');
-const bgMusic = document.getElementById('bg-music');
-const bgVideo = document.getElementById('bg-video');
-const msgContainer = document.getElementById('message-container');
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const jumpBtn = document.getElementById("jumpBtn");
 
-let width, height, particles = [], fixedStars = [];
+const CONFIG = {
+  particleCount: 2000,
+  baseEventHorizon: 120,
+  gravity: 0.15,
+  backgroundFade: 0.08,
+  maxDistanceFactor: 0.9
+};
 
-const notes = [
-    "Sen sıradan biri değilsin. Senin yerini bu dünyada kimse dolduramaz.", 
-    "Adını anmak bile insanın içini ısıtır",
-    "Herkes parıltının peşinde, ben senin o dingin ışığına hayranım.",
-    "Kırıldığın yerlerden bile ışık sızıyor",
-    "Senin varlığın dünya'ya biraz daha anlam kazandıyor.",
-    "Her şey çok hızlı, bir tek senin yanında yavaşlamak güzel.",
-    "Gülüşün, karanlık bir günü bile hafifletmeye yeter.",
-    "Yorgunluğunu kapıda bırakan o rahatlık hissisin.",
-    "Karmaşık hiçbir şeye gerek yok, burada sadece biz varız.",
-    "En güvenli sığınağım; seninle geçen beş dakika.", 
-    "İyi ki varsın.",
-    "Bazı insanlar iyidir… Sen ise huzur gibisin.",
-    "Seninle her şey daha katlanılabilir.", 
-    "Seninle susmak bile dünyanın en güzel sohbeti.",
-    "Senin sesindeki o dinginlik, dünyanın tüm gürültüsünü bastırmaya yetiyor.",
-    "Eğer bu dünya biraz daha güzel görünüyorsa, bunda senin payın var.",
-    "Sadece 'an'da kalmak; ne bir eksik, ne bir fazla."
-];
+let particles = [];
+let eventHorizon = CONFIG.baseEventHorizon;
 
+let zoomLevel = 1;
+let velocity = 0;
+let acceleration = 0.00008; // düşüş hızını buradan ayarlıyorsun
+let isJumping = false;
 
-// ⭐ Renk paleti (gerçek yıldız tonları)
-const starColors = [
-    '255,255,255', // beyaz
-    '255,244,214', // sıcak sarı
-    '202,216,255'  // hafif mavi
-];
+let showText = false;
+let textAlpha = 0;
+let blackScreen = false;
 
-
-// Yıldızları oluştur
-function createFixedStars() {
-    fixedStars = [];
-
-    notes.forEach(note => {
-
-        const randomColor = starColors[
-            Math.floor(Math.random() * starColors.length)
-        ];
-
-        fixedStars.push({
-            x: Math.random() * (window.innerWidth - 100) + 50,
-            y: Math.random() * (window.innerHeight * 0.4 - 50) + 30,
-
-            // ⭐ Daha büyük yıldızlar
-            size: Math.random() * 2.2 + 0.8,
-
-            note: note,
-            glow: Math.random() * Math.PI,
-
-            // ⭐ Daha yumuşak blink
-            blinkSpeed: 0.008 + Math.random() * 0.015,
-
-            color: randomColor
-        });
-    });
-}
-
+// ======================
+// Resize
+// ======================
 function resize() {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-    createFixedStars();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+  canvas.style.width = window.innerWidth + "px";
+  canvas.style.height = window.innerHeight + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
-
-window.addEventListener('resize', resize);
+window.addEventListener("resize", resize);
 resize();
 
-
-// BAŞLAT BUTONU
-startBtn.addEventListener('click', () => {
-    overlay.style.opacity = '0';
-
-    setTimeout(() => {
-        overlay.style.display = 'none';
-        bgMusic.play().catch(e => console.log("Müzik çalınamadı."));
-        document.getElementById("bottom-button").style.opacity = 1;
-    }, 1000);
+// ======================
+// Button
+// ======================
+jumpBtn.addEventListener("click", () => {
+  isJumping = true;
+  jumpBtn.style.opacity = "0";
+  jumpBtn.style.pointerEvents = "none";
 });
 
+// ======================
+// Particle
+// ======================
+class Particle {
+  constructor() {
+    this.reset(true);
+  }
 
-// ⭐⭐⭐ ULTRA GERÇEKÇİ YILDIZ
-function drawFlareStar(x, y, size, opacity, color) {
+  reset(initial = false) {
+    this.angle = Math.random() * Math.PI * 2;
+    this.distance =
+      Math.random() * Math.max(canvas.width, canvas.height) *
+        CONFIG.maxDistanceFactor +
+      eventHorizon;
 
+    this.speed = Math.random() * 0.02 + 0.005;
+    this.size = Math.random() * 1.2;
+    this.alpha = initial ? Math.random() * 0.6 : 0;
+  }
+
+  update() {
+    this.angle += this.speed;
+
+    let gravityForce = CONFIG.gravity;
+    if (isJumping) gravityForce *= 5;
+
+    this.distance -= gravityForce * (1 + 200 / this.distance);
+
+    if (this.distance <= eventHorizon) {
+      this.reset();
+    }
+
+    this.x =
+      canvas.width / 2 +
+      Math.cos(this.angle) * this.distance;
+    this.y =
+      canvas.height / 2 +
+      Math.sin(this.angle) * this.distance;
+
+    if (this.alpha < 0.7) this.alpha += 0.01;
+  }
+
+  draw() {
+    ctx.fillStyle = `rgba(120,180,255,${this.alpha})`;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size * zoomLevel, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+// ======================
+// Black Hole
+// ======================
+function drawBlackHole() {
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+
+  const glow = ctx.createRadialGradient(
+    centerX,
+    centerY,
+    eventHorizon,
+    centerX,
+    centerY,
+    eventHorizon * 2
+  );
+
+  glow.addColorStop(0, "rgba(80,120,255,0.5)");
+  glow.addColorStop(1, "rgba(0,0,0,0)");
+
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, eventHorizon * 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#000";
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, eventHorizon, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// ======================
+// Init
+// ======================
+function init() {
+  particles = [];
+  for (let i = 0; i < CONFIG.particleCount; i++) {
+    particles.push(new Particle());
+  }
+}
+
+// ======================
+// Animate
+// ======================
+function animate() {
+
+  if (!blackScreen) {
+    ctx.fillStyle = `rgba(0,0,10,${CONFIG.backgroundFade})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  if (isJumping && !blackScreen) {
+    velocity += acceleration;
+    zoomLevel += velocity;
+    eventHorizon += velocity * 5;
+
+    if (zoomLevel > 8) {
+      blackScreen = true;
+
+      // 1 saniye sonra yazı gelsin
+      setTimeout(() => {
+        showText = true;
+      }, 1000);
+    }
+  }
+
+  if (!blackScreen) {
     ctx.save();
-    ctx.translate(x, y);
 
-    // Büyük glow
-    const outerGlow = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 25);
-    outerGlow.addColorStop(0, `rgba(${color},${opacity * 0.15})`);
-    outerGlow.addColorStop(0.4, `rgba(${color},${opacity * 0.07})`);
-    outerGlow.addColorStop(1, 'transparent');
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.scale(zoomLevel, zoomLevel);
+    ctx.translate(-canvas.width / 2, -canvas.height / 2);
 
-    ctx.fillStyle = outerGlow;
-    ctx.beginPath();
-    ctx.arc(0, 0, size * 25, 0, Math.PI * 2);
-    ctx.fill();
+    drawBlackHole();
 
-
-    // Orta glow
-    const midGlow = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 10);
-    midGlow.addColorStop(0, `rgba(${color},${opacity * 0.35})`);
-    midGlow.addColorStop(1, 'transparent');
-
-    ctx.fillStyle = midGlow;
-    ctx.beginPath();
-    ctx.arc(0, 0, size * 10, 0, Math.PI * 2);
-    ctx.fill();
-
-
-    // Çekirdek
-    ctx.fillStyle = `rgba(255,255,255,${opacity})`;
-    ctx.beginPath();
-    ctx.arc(0, 0, size * 1.3, 0, Math.PI * 2);
-    ctx.fill();
-
-
-    // Lens flare
-    ctx.strokeStyle = `rgba(255,255,255,${opacity * 0.5})`;
-    ctx.lineWidth = 0.6;
-
-    for (let i = 0; i < 4; i++) {
-        ctx.beginPath();
-        ctx.moveTo(-size * 12, 0);
-        ctx.lineTo(size * 12, 0);
-        ctx.stroke();
-        ctx.rotate(Math.PI / 4);
+    for (let p of particles) {
+      p.update();
+      p.draw();
     }
 
     ctx.restore();
+  } else {
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  // ======================
+  // FINAL TEXT
+  // ======================
+  if (showText) {
+    if (textAlpha < 1) textAlpha += 0.01;
+
+    ctx.fillStyle = `rgba(255,255,255,${textAlpha})`;
+    ctx.font = "32px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(
+      "Sessizliğin en büyük haykırış",
+      canvas.width / 2,
+      canvas.height / 2
+    );
+  }
+
+  requestAnimationFrame(animate);
 }
 
-
-// Parçacık sınıfı
-class Particle {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.size = Math.random() * 1.5;
-        this.speedX = (Math.random() - 0.5) * 0.5;
-        this.speedY = (Math.random() - 0.5) * 0.5;
-        this.life = 100;
-    }
-
-    update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        this.life -= 1.2;
-    }
-
-    draw() {
-        ctx.fillStyle = `rgba(255,255,255,${this.life / 100})`;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-    }
-}
-
-
-// Mouse + touch
-function handleMove(e) {
-    if (overlay.style.display === 'none') {
-
-        let x, y;
-
-        if (e.type.includes('touch')) {
-            x = e.touches[0].clientX;
-            y = e.touches[0].clientY;
-        } else {
-            x = e.clientX;
-            y = e.clientY;
-        }
-
-        particles.push(new Particle(x, y));
-    }
-}
-
-window.addEventListener('mousemove', handleMove);
-window.addEventListener('touchmove', handleMove, { passive: true });
-
-
-// Mesaj
-window.addEventListener('click', (e) => {
-    if (overlay.style.display === 'none') {
-
-        fixedStars.forEach(star => {
-
-            const d = Math.sqrt(
-                (e.clientX - star.x) ** 2 +
-                (e.clientY - star.y) ** 2
-            );
-
-            if (d < 45) {
-                msgContainer.innerText = star.note;
-                msgContainer.style.opacity = 1;
-                setTimeout(() => msgContainer.style.opacity = 0, 6000);
-            }
-        });
-    }
-});
-
-
-function animate() {
-
-    ctx.clearRect(0, 0, width, height);
-
-    fixedStars.forEach(star => {
-
-        star.glow += star.blinkSpeed;
-
-        const currentOpacity =
-            0.35 + Math.abs(Math.sin(star.glow)) * 0.65;
-
-        drawFlareStar(
-            star.x,
-            star.y,
-            star.size,
-            currentOpacity,
-            star.color
-        );
-    });
-
-    particles.forEach((p, i) => {
-        p.update();
-        p.draw();
-
-        if (p.life <= 0)
-            particles.splice(i, 1);
-    });
-
-    requestAnimationFrame(animate);
-}
-
+init();
 animate();

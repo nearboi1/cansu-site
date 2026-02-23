@@ -1,138 +1,38 @@
-* {
+body, html {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-}
-
-body, html {
-    width: 100%;
-    height: 100%;
     overflow: hidden;
-    background-color: transparent;
+    background-color: #000;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
-/* VIDEO */
-#bg-video {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    object-fit: cover;
-    z-index: -2;
-    background-color: black;
-    filter: brightness(0.5);
+canvas {
+    display: block;
 }
 
-/* CANVAS */
-#canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    background: transparent !important;
-}
-
-/* MESAJ */
-#message-container {
-    position: fixed;
-    top: 50%;
+/* Buton */
+.jump-btn {
+    position: absolute;
     left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 100;
-    color: white;
-    font-family: 'Georgia', serif;
-    font-size: 2rem;
-    text-align: center;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 1s ease;
-    text-shadow: 0 0 15px white;
-    width: 80%;
-}
-
-/* OVERLAY */
-#overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 999;
-    background: radial-gradient(circle, #000428 0%, #000 100%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: opacity 1s;
-}
-
-button {
-    padding: 15px 40px;
-    font-size: 1.2rem;
-    cursor: pointer;
-    background: transparent;
-    color: white;
-    border: 2px solid white;
-    border-radius: 50px;
-    backdrop-filter: blur(5px);
-}
-
-/* ALT ORTA BUTON */
-#bottom-button {
-    position: fixed;
-    bottom: 40px;
-    left: 50%;
+    bottom: 8%; /* ORTA-ALT */
     transform: translateX(-50%);
-    z-index: 500;
-    opacity: 0;
-    transition: opacity 1s ease;
-}
-
-/* 🔥 DÜZELTİLMİŞ BUTON */
-#bottom-button a {
-
-    display: inline-block;
-
-    padding: 14px 28px;
-    font-size: clamp(14px, 4vw, 18px);
-
-    text-align: center;
-    white-space: nowrap;
-
-    max-width: 90vw;
-    width: fit-content;
-
-    text-decoration: none;
+    padding: 18px 42px;
+    font-size: 18px;
+    letter-spacing: 3px;
     color: white;
-    border: 2px solid white;
-    border-radius: 50px;
-
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(120,180,255,0.6);
     backdrop-filter: blur(10px);
-    background: rgba(255,255,255,0.05);
-
-    transition: all 0.3s ease;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    z-index: 10;
 }
 
-#bottom-button a:hover {
-    background: white;
-    color: black;
-    transform: scale(1.05);
+.jump-btn:hover {
+    background: rgba(120,180,255,0.2);
+    box-shadow: 0 0 25px rgba(120,180,255,0.6);
 }
 
-/* 🔥 MOBİL OPTİMİZASYON */
-@media (max-width: 600px){
-
-    #bottom-button{
-        bottom: 60px;
-    }
-
-    #bottom-button a{
-        padding: 12px 22px;
-        font-size: 15px;
-        max-width: 85vw;
-        white-space: normal; /* taşarsa alt satıra geçsin */
-    }
-
+.jump-btn:active {
+    transform: translateX(-50%) scale(0.95);
 }
